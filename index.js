@@ -44,8 +44,7 @@ app.get("/calculate/:number1/:number2",async (req,res)=>{
         }).save();
 
         const unique_identifier=task["_id"];
-        newJob("Sn");
-        // newJob(unique_identifier,num1,num2);
+        newJob(unique_identifier,num1,num2);
         return res.status(201).json({
             success:true,
             message:"successfully added to queue",
@@ -65,6 +64,38 @@ app.get("/calculate/:number1/:number2",async (req,res)=>{
             num1,num2
         }
     })
+})
+
+app.get("/get_answer/:identifier",async(req,res)=>{
+    const id=req.params.identifier;
+
+    try{
+        const task=await Task.findById(id);
+        if(task===undefined){
+            return res.status(404).json({
+                success:false,
+                message:"Couldn't find the task",
+            })
+        }
+        if(task.status=="pending"){
+            return res.status(200).json({
+                success:true,
+                message:"Please wait",
+            })
+        }
+        else
+        {
+            return res.status(200).json({
+                success:true,
+                answer:task.answer
+            })
+        }
+    }catch(err){
+        return res.status(404).json({
+            success:false,
+            message:"Couldn't find the task",
+        })
+    }
 })
 
 
